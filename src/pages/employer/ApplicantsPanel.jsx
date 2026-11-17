@@ -4,6 +4,7 @@ import ResumeActions from "../../components/resume/ResumeActions";
 import { API_PHP } from "../../config/env";
 import { initialsOf } from "../../utils/initials";
 import ResumeVersionView from "./ResumeVersionView";
+import PagedList from "../../components/ui/PagedList";
 
 const API = `${API_PHP}/applications.php`;
 const TABS = ["All", "Applied", "Shortlisted", "Selected", "Rejected"];
@@ -341,36 +342,38 @@ export default function ApplicantsPanel({ initialStatus = "All", onToast }) {
                 </div>
             ) : (
                 <div className="ap-list">
-                    {shown.map((a) => (
-                        <div className="ap-row" key={a.id} onClick={() => openApp(a)}>
-                            <div className="ap-av" style={{ background: AVATARS[a.candidate_id % AVATARS.length] }}>
-                                {initialsOf(a.candidate_name)}
-                            </div>
-
-                            <div>
-                                <div className="ap-name">
-                                    {a.candidate_name}
-                                    <span className="ap-badge" style={{ background: COLORS[a.status] || "#888" }}>
-                                        {a.status}
-                                    </span>
+                    <PagedList list={shown} resetKey={tab + jobFilter + search}>
+                        {(items) => items.map((a) => (
+                            <div className="ap-row" key={a.id} onClick={() => openApp(a)}>
+                                <div className="ap-av" style={{ background: AVATARS[a.candidate_id % AVATARS.length] }}>
+                                    {initialsOf(a.candidate_name)}
                                 </div>
-                                <div className="ap-sub">
-                                    Applied for <b>{a.job_title}</b> on {fmtDate(a.applied_at)}
-                                </div>
-                                <div className="ap-sub">{a.candidate_email}</div>
-                            </div>
 
-                            <button
-                                className="ap-view"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    openApp(a);
-                                }}
-                            >
-                                View Details →
-                            </button>
-                        </div>
-                    ))}
+                                <div>
+                                    <div className="ap-name">
+                                        {a.candidate_name}
+                                        <span className="ap-badge" style={{ background: COLORS[a.status] || "#888" }}>
+                                            {a.status}
+                                        </span>
+                                    </div>
+                                    <div className="ap-sub">
+                                        Applied for <b>{a.job_title}</b> on {fmtDate(a.applied_at)}
+                                    </div>
+                                    <div className="ap-sub">{a.candidate_email}</div>
+                                </div>
+
+                                <button
+                                    className="ap-view"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openApp(a);
+                                    }}
+                                >
+                                    View Details →
+                                </button>
+                            </div>
+                        ))}
+                    </PagedList>
                 </div>
             )}
         </section>

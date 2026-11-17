@@ -1,4 +1,5 @@
 import { CandidateIcon as Icon } from "../../../components/ui/Icon";
+import PagedList from "../../../components/ui/PagedList";
 
 export default function SavedJobsSection({
     allJobs,
@@ -8,35 +9,35 @@ export default function SavedJobsSection({
 }) {
     return (
         saved.length > 0 ? (
-                            <section className="jobs-section">
-                                <div className="extra-jobs-grid">
-                                    {allJobs
-                                        .filter((j) => saved.includes(j.id))
-                                        .map(renderJobCard)}
-                                </div>
-                            </section>
-                        ) : (
-                            <section className="content-panel">
+            <section className="jobs-section">
+                <div className="extra-jobs-grid">
+                    <PagedList list={allJobs.filter((j) => saved.includes(j.id))} perPage={6}>
+                        {(items) => items.map(renderJobCard)}
+                    </PagedList>
+                </div>
+            </section>
+        ) : (
+            <section className="content-panel">
 
-                                <div className="big-panel-icon purple-bg">
-                                    <Icon name="bookmark" size={35} />
-                                </div>
+                <div className="big-panel-icon purple-bg">
+                    <Icon name="bookmark" size={35} />
+                </div>
 
-                                <h2>Your Saved Jobs</h2>
+                <h2>Your Saved Jobs</h2>
 
-                                <p>
-                                    Jobs you save will appear here so you can
-                                    easily come back to them later.
-                                </p>
+                <p>
+                    Jobs you save will appear here so you can
+                    easily come back to them later.
+                </p>
 
-                                <button
-                                    className="primary-btn"
-                                    onClick={() => setActive("find")}
-                                >
-                                    Find More Jobs
-                                </button>
+                <button
+                    className="primary-btn"
+                    onClick={() => setActive("find")}
+                >
+                    Find More Jobs
+                </button>
 
-                            </section>
-                        )
+            </section>
+        )
     );
 }

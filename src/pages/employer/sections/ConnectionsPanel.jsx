@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../../services/interactionsService";
+import PagedList from "../../../components/ui/PagedList";
 
 const initials = (name = "") =>
     name.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase() || "?";
@@ -130,11 +131,12 @@ export default function ConnectionsPanel() {
                         <p className="nw-empty">No people found.</p>
                     ) : (
                         <div className="nw-grid">
-                            {people.map((p) => (
+                            <PagedList list={people} perPage={12} pageKey="dp" resetKey={q + roleFilter}>{(items) => items.map((p) => (
                                 <Person key={p.id} p={p}>
                                     <button className="nw-btn primary" onClick={() => connect(p.id)}>+ Connect</button>
                                 </Person>
                             ))}
+                            </PagedList>
                         </div>
                     )}
                 </>
@@ -147,12 +149,13 @@ export default function ConnectionsPanel() {
                         <p className="nw-empty">No pending requests.</p>
                     ) : (
                         <div className="nw-grid">
-                            {received.map((p) => (
+                            <PagedList list={received} perPage={12} pageKey="rp">{(items) => items.map((p) => (
                                 <Person key={p.connection_id} p={p}>
                                     <button className="nw-btn primary" onClick={() => respond(p.connection_id, "accept")}>Accept</button>
                                     <button className="nw-btn ghost" onClick={() => respond(p.connection_id, "reject")}>Ignore</button>
                                 </Person>
                             ))}
+                            </PagedList>
                         </div>
                     )}
 
@@ -161,13 +164,14 @@ export default function ConnectionsPanel() {
                         <p className="nw-empty">You have not sent any requests.</p>
                     ) : (
                         <div className="nw-grid">
-                            {sent.map((p) => (
+                            <PagedList list={sent} perPage={12} pageKey="sp">{(items) => items.map((p) => (
                                 <Person key={p.connection_id} p={p}>
                                     <button className="nw-btn ghost" onClick={() => remove(p.connection_id, "Request withdrawn")}>
                                         Withdraw
                                     </button>
                                 </Person>
                             ))}
+                            </PagedList>
                         </div>
                     )}
                 </>
@@ -186,13 +190,14 @@ export default function ConnectionsPanel() {
                         <p className="nw-empty">No connections yet. Start from "People you may know".</p>
                     ) : (
                         <div className="nw-grid">
-                            {shownFriends.map((p) => (
+                            <PagedList list={shownFriends} perPage={12} pageKey="np" resetKey={friendSearch}>{(items) => items.map((p) => (
                                 <Person key={p.connection_id} p={p}>
                                     <button className="nw-btn ghost" onClick={() => remove(p.connection_id, "Connection removed")}>
                                         Remove
                                     </button>
                                 </Person>
                             ))}
+                            </PagedList>
                         </div>
                     )}
                 </>

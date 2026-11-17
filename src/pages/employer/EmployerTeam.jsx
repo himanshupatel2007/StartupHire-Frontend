@@ -4,6 +4,7 @@ import PendingInvites from "./PendingInvites";
 import { API_PHP } from "../../config/env";
 import { getStoredUser } from "../../utils/storage";
 import { initialsOf } from "../../utils/initials";
+import PagedList from "../../components/ui/PagedList";
 
 const API_BASE = API_PHP;
 
@@ -453,85 +454,87 @@ function EmployerTeam({ onToast }) {
                 </div>
             ) : (
                 <div className="tm-list">
-                    {shown.map((m, idx) => {
-                        const role = roleLabel(m);
-                        const isMe = m.user_id === me;
-                        const busy = busyId === m.user_id;
+                    <PagedList list={shown} perPage={8} resetKey={query + filter}>
+                        {(items) => items.map((m, idx) => {
+                            const role = roleLabel(m);
+                            const isMe = m.user_id === me;
+                            const busy = busyId === m.user_id;
 
-                        return (
-                            <article key={m.membership_id} className={`tm-card tm-member ${m.status}`} style={{ animationDelay: `${idx * 60}ms` }}>
-                                <div className="tm-top">
-                                    <div className="tm-av" style={{ background: GRADS[m.user_id % GRADS.length] }}>
-                                        {initialsOf(m.name)}
-                                    </div>
-
-                                    <div className="tm-who">
-                                        <h4>
-                                            {m.name}
-                                            {isMe && <span className="tm-you">You</span>}
-                                        </h4>
-                                        <p>{m.email}</p>
-                                        {m.added_on && <small>Added {fmtDate(m.added_on)}</small>}
-                                    </div>
-
-                                    <div className="tm-badges">
-                                        <span className={`tm-role r-${role.key}`}>{role.label}</span>
-                                        <span className={`tm-status ${m.status}`}>
-                                            <i />
-                                            {m.status === "active" ? "Active" : "Inactive"}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* permissions */}
-                                {editFor === m.user_id ? (
-                                    <div className="tm-edit">
-                                        <PermPicker value={editPerms} onChange={setEditPerms} />
-                                        <div className="tm-actions">
-                                            <button type="button" className="tm-btn ghost" onClick={() => setEditFor(null)}>
-                                                Cancel
-                                            </button>
-                                            <button type="button" className="tm-btn pri" onClick={saveEdit} disabled={saving}>
-                                                {saving ? "Saving..." : "Save access"}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="tm-chips">
-                                            {m.is_owner ? (
-                                                <span className="tm-chip t-full">
-                                                    <Ic n="shield" s={13} /> Full access (all permissions)
-                                                </span>
-                                            ) : m.permissions.length === 0 ? (
-                                                <span className="tm-chip t-none">No permissions assigned</span>
-                                            ) : (
-                                                m.permissions.map((p) => (
-                                                    <span key={p} className={`tm-chip t-${PERMS[p]?.tone || "blue"}`}>
-                                                        {PERMS[p]?.label || p}
-                                                    </span>
-                                                ))
-                                            )}
+                            return (
+                                <article key={m.membership_id} className={`tm-card tm-member ${m.status}`} style={{ animationDelay: `${idx * 60}ms` }}>
+                                    <div className="tm-top">
+                                        <div className="tm-av" style={{ background: GRADS[m.user_id % GRADS.length] }}>
+                                            {initialsOf(m.name)}
                                         </div>
 
-                                        {canManage && !m.is_owner && (
+                                        <div className="tm-who">
+                                            <h4>
+                                                {m.name}
+                                                {isMe && <span className="tm-you">You</span>}
+                                            </h4>
+                                            <p>{m.email}</p>
+                                            {m.added_on && <small>Added {fmtDate(m.added_on)}</small>}
+                                        </div>
+
+                                        <div className="tm-badges">
+                                            <span className={`tm-role r-${role.key}`}>{role.label}</span>
+                                            <span className={`tm-status ${m.status}`}>
+                                                <i />
+                                                {m.status === "active" ? "Active" : "Inactive"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* permissions */}
+                                    {editFor === m.user_id ? (
+                                        <div className="tm-edit">
+                                            <PermPicker value={editPerms} onChange={setEditPerms} />
                                             <div className="tm-actions">
-                                                <button type="button" className="tm-btn soft" onClick={() => startEdit(m)} disabled={busy}>
-                                                    <Ic n="edit" s={15} /> Edit access
+                                                <button type="button" className="tm-btn ghost" onClick={() => setEditFor(null)}>
+                                                    Cancel
                                                 </button>
-                                                <button type="button" className="tm-btn soft" onClick={() => toggleStatus(m)} disabled={busy}>
-                                                    <Ic n="power" s={15} /> {m.status === "active" ? "Deactivate" : "Activate"}
-                                                </button>
-                                                <button type="button" className="tm-btn danger" onClick={() => setConfirm(m)} disabled={busy}>
-                                                    <Ic n="trash" s={15} /> Remove
+                                                <button type="button" className="tm-btn pri" onClick={saveEdit} disabled={saving}>
+                                                    {saving ? "Saving..." : "Save access"}
                                                 </button>
                                             </div>
-                                        )}
-                                    </>
-                                )}
-                            </article>
-                        );
-                    })}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="tm-chips">
+                                                {m.is_owner ? (
+                                                    <span className="tm-chip t-full">
+                                                        <Ic n="shield" s={13} /> Full access (all permissions)
+                                                    </span>
+                                                ) : m.permissions.length === 0 ? (
+                                                    <span className="tm-chip t-none">No permissions assigned</span>
+                                                ) : (
+                                                    m.permissions.map((p) => (
+                                                        <span key={p} className={`tm-chip t-${PERMS[p]?.tone || "blue"}`}>
+                                                            {PERMS[p]?.label || p}
+                                                        </span>
+                                                    ))
+                                                )}
+                                            </div>
+
+                                            {canManage && !m.is_owner && (
+                                                <div className="tm-actions">
+                                                    <button type="button" className="tm-btn soft" onClick={() => startEdit(m)} disabled={busy}>
+                                                        <Ic n="edit" s={15} /> Edit access
+                                                    </button>
+                                                    <button type="button" className="tm-btn soft" onClick={() => toggleStatus(m)} disabled={busy}>
+                                                        <Ic n="power" s={15} /> {m.status === "active" ? "Deactivate" : "Activate"}
+                                                    </button>
+                                                    <button type="button" className="tm-btn danger" onClick={() => setConfirm(m)} disabled={busy}>
+                                                        <Ic n="trash" s={15} /> Remove
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </article>
+                            );
+                        })}
+                    </PagedList>
                 </div>
             )}
 
