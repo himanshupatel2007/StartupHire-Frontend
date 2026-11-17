@@ -22,7 +22,7 @@ export default function MyJobsSection({
     return (
         <section className="jobs-section">
             <div className="extra-jobs-grid">
-                <PagedList list={myJobs} perPage={6}>
+                <PagedList list={myJobs} perPage={1}>
                     {(items) => items.map((job) => (
                         <article className="big-job-card" key={job.id}>
                             <div
