@@ -33,6 +33,8 @@ import EmployerUsersSection from "./sections/EmployerUsersSection";
 import JobSocialModal from "../../components/social/JobSocialModal";
 import { candidateAdapter } from "../../services/candidateSocialAdapter";
 import ConnectionsPanel from "./sections/ConnectionsPanel";
+import usePagedList from "../../hooks/usePagedList";
+import Pagination from "../../components/ui/Pagination";
 function Employer({ onLogout }) {
     const navigate = useNavigate();
     const currentUser = (() => {
@@ -78,7 +80,7 @@ function Employer({ onLogout }) {
         openReport, submitReport,
         savedResumes, toggleSaveResume,
     } = useInteractions(setToast);
-    const [candidates, setCandidates] = useState([]);
+
     const [connMap, setConnMap] = useState({}); // userId -> connected | sent | received
 
     const loadConnStates = async () => {
@@ -100,22 +102,11 @@ function Employer({ onLogout }) {
 
     useEffect(() => { loadConnStates(); }, []);
 
-    useEffect(() => {
-        api("/interactions/candidates")
-            .then((data) => {
-                console.log("Candidates API:", data);
-                if (data.success) {
-                    setCandidates(data.candidates.filter((c) => !isIncomplete(c)));
-                } else {
-                    setCandidates([]);
-                    setToast(data.message || "Failed to load candidates");
-                }
-            })
-            .catch((e) => {
-                console.error("Candidates API error:", e);
-                setCandidates([]);
-            });
-    }, []);
+    const [applied, setApplied] = useState({ search: "", category: "All" });
+    const { items: candidates, meta, loading: candLoading, setPage } = usePagedList(
+        "/interactions/candidates", "candidates",
+        { search: applied.search, category: applied.category }
+    );
     const [company, setCompany] = useState(() => {
         try {
             return JSON.parse(localStorage.getItem(getCompanyKey()) || "null");
@@ -638,15 +629,8 @@ function Employer({ onLogout }) {
         (c) => filter === "All" || c.category === filter
     );
 
-    const baseFiltered = candidates.filter(
-        (c) =>
-            (filter === "All" || c.category === filter) &&
-            (c.name.toLowerCase().includes(search.toLowerCase()) ||
-                c.role.toLowerCase().includes(search.toLowerCase()) ||
-                c.location.toLowerCase().includes(search.toLowerCase()))
-    );
 
-    const filteredCandidates = applyCandidateFilters(baseFiltered, advFilters);
+    const filteredCandidates = applyCandidateFilters(candidates, advFilters);
 
     // Sidebar / account panel ke options ab HAMESHA naye browser tab mein khulte hain
     const handleMenu = (id) => {
@@ -727,12 +711,13 @@ function Employer({ onLogout }) {
     );
     const renderCandidatesWithPanel = (list) => (
         <div className="tc-layout">
-            <div className="tc-main">{renderCandidates(list)}</div>
+            <div className="tc-main">
+                {candLoading ? <p>Loading candidates...</p> : renderCandidates(list)}
+                <Pagination meta={meta} onChange={setPage} />
+            </div>
             <InteractionsPanel items={interactions} onMarkAllRead={markAllRead} />
-
         </div>
     );
-
     return (
         <div className={`candidate-app employer-app ${darkMode ? "dark" : ""}`}>
 
@@ -797,10 +782,7 @@ function Employer({ onLogout }) {
                                             <button
                                                 key={f}
                                                 className={`chip ${filter === f ? "active" : ""}`}
-                                                onClick={() => {
-                                                    setFilter(f);
-                                                    if (active !== "applicants") setActive("applicants");
-                                                }}
+                                                onClick={() => setFilter(f)}
                                             >
                                                 {f}
                                             </button>
@@ -812,7 +794,8 @@ function Employer({ onLogout }) {
                                         style={{ marginTop: 12 }}
                                         onClick={() => {
                                             setToolsOpen(false);
-                                            setActive("applicants");
+                                            setApplied({ search, category: filter });
+                                            setActive("dashboard");
                                         }}
                                     >
                                         Apply &amp; view results

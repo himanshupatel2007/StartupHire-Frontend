@@ -1,24 +1,41 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../services/interactionsService";
 
-export default function usePagedList(path, { key = "data", perPage = 12, extra = {} } = {}) {
+/**
+ * Reusable paged list. Page URL mein rehta hai (?page=2).
+ *   usePagedList("/interactions/candidates", "candidates", { search, category })
+ *   usePagedList("/connections", "connections")
+ * Ek page par do list ho to pageKey alag do: { pageKey: "page2" }
+ */
+export default function usePagedList(path, key, params = {}, opts = {}) {
+    const { perPage = 12, pageKey = "page" } = opts;
     const [sp, setSp] = useSearchParams();
-    const page = Math.max(1, parseInt(sp.get("page") || "1", 10));
+    const page = Math.max(parseInt(sp.get(pageKey) || "1", 10) || 1, 1);
 
     const [items, setItems] = useState([]);
-    const [meta, setMeta] = useState({ page: 1, per_page: perPage, total: 0, last_page: 1 });
+    const [meta, setMeta] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const extraKey = JSON.stringify(extra);
+    const [tick, setTick] = useState(0);
+
+    const paramsKey = JSON.stringify(params);
+
+    const setPage = useCallback((p) => {
+        setSp((prev) => {
+            const n = new URLSearchParams(prev);
+            n.set(pageKey, String(p));
+            return n;
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [setSp, pageKey]);
 
     useEffect(() => {
         let off = false;
         setLoading(true);
-
         const qs = new URLSearchParams({ page, per_page: perPage });
-        Object.entries(extra).forEach(([k, v]) => {
-            if (v !== "" && v != null && v !== "All") qs.set(k, v);
+        Object.entries(params).forEach(([k, v]) => {
+            if (v && v !== "All") qs.set(k, v);
         });
 
         api(`${path}?${qs}`)
@@ -26,25 +43,18 @@ export default function usePagedList(path, { key = "data", perPage = 12, extra =
                 if (off) return;
                 if (d.success) {
                     setItems(d[key] || []);
-                    if (d.meta) setMeta(d.meta);
+                    setMeta(d.meta || null);
                     setError("");
                 } else {
+                    setItems([]);
                     setError(d.message || "Failed to load");
                 }
             })
-            .catch(() => !off && setError("Could not load data"))
-            .finally(() => !off && setLoading(false));
+            .catch(() => { if (!off) { setItems([]); setError("Failed to load"); } })
+            .finally(() => { if (!off) setLoading(false); });
 
         return () => { off = true; };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [path, page, perPage, extraKey, key]);
+    }, [path, key, page, paramsKey, perPage, tick]);
 
-    const setPage = (p) => {
-        const next = new URLSearchParams(sp);
-        next.set("page", String(p));
-        setSp(next);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    return { items, meta, page, setPage, loading, error };
+    return { items, meta, loading, error, page, setPage, reload: () => setTick((t) => t + 1) };
 }
