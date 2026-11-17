@@ -1,5 +1,6 @@
 import { CandidateIcon as Icon } from "../../../components/ui/Icon";
 import ActivityFeed from "../components/ActivityFeed";
+import PagedList from "../../../components/ui/PagedList";
 
 export default function NotificationsSection({
     markAllRead,
@@ -29,33 +30,35 @@ export default function NotificationsSection({
             </div>
 
             <div className="notifications-list-full">
-                {notifications.map((n) => (
-                    <div
-                        className={`notification-row ${n.unread ? "unread" : ""}`}
-                        key={n.id}
-                    >
-                        <span className={`notif-icon notif-${n.type}`}>
-                            <Icon
-                                name={
-                                    n.type === "job"
-                                        ? "briefcase"
-                                        : n.type === "message"
-                                            ? "message"
-                                            : "bell"
-                                }
-                                size={20}
-                            />
-                        </span>
+                <PagedList list={notifications} perPage={10}>
+                    {(items) => items.map((n) => (
+                        <div
+                            className={`notification-row ${n.unread ? "unread" : ""}`}
+                            key={n.id}
+                        >
+                            <span className={`notif-icon notif-${n.type}`}>
+                                <Icon
+                                    name={
+                                        n.type === "job"
+                                            ? "briefcase"
+                                            : n.type === "message"
+                                                ? "message"
+                                                : "bell"
+                                    }
+                                    size={20}
+                                />
+                            </span>
 
-                        <div>
-                            <strong>{n.title}</strong>
-                            <p>{n.desc}</p>
-                            <small>{n.time}</small>
+                            <div>
+                                <strong>{n.title}</strong>
+                                <p>{n.desc}</p>
+                                <small>{n.time}</small>
+                            </div>
+
+                            {n.unread && <span className="unread-dot"></span>}
                         </div>
-
-                        {n.unread && <span className="unread-dot"></span>}
-                    </div>
-                ))}
+                    ))}
+                </PagedList>
             </div>
 
         </section>
