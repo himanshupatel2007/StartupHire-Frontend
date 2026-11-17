@@ -1045,3 +1045,38 @@
 .profile-arrow {
     display: none !important;
 }
+
+.pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    margin: 22px 0;
+}
+
+.pager button {
+    border: 1.5px solid rgba(120, 120, 140, .3);
+    background: transparent;
+    color: inherit;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pager button.active {
+    background: #5b3df5;
+    border-color: #5b3df5;
+    color: #fff;
+}
+
+.pager button:disabled {
+    opacity: .4;
+    cursor: default;
+}
+
+.pager small {
+    opacity: .6;
+    margin-left: 8px;
+}
