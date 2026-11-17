@@ -105,7 +105,8 @@ function Employer({ onLogout }) {
     const [applied, setApplied] = useState({ search: "", category: "All" });
     const { items: candidates, meta, loading: candLoading, setPage } = usePagedList(
         "/interactions/candidates", "candidates",
-        { search: applied.search, category: applied.category }
+        { search: applied.search, category: applied.category },
+        { perPage: 2 }
     );
     const [company, setCompany] = useState(() => {
         try {
