@@ -1,6 +1,5 @@
 import { resumeTabsList } from "../../../constants/resume";
 import { downloadResume } from "../../../utils/resumePdf";
-import { safeLink } from "../../../utils/safeLink";
 import { CandidateIcon as Icon } from "../../../components/ui/Icon";
 import { AttachmentField } from "../../../components/resume/AttachmentField";
 import { ReferenceFields } from "../../../components/resume/ReferenceFields";
@@ -1011,20 +1010,20 @@ export default function ProfileSection({
                                                                     ))}
                                                                 </div>
                                                                 <p className="resume-item-details">{proj.description}</p>
-                                                                {safeLink(proj.link) ? (
-                                                                    <a
-                                                                        href={safeLink(proj.link)}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="resume-project-link"
-                                                                    >
-                                                                        View Project <Icon name="arrow" size={14} />
-                                                                    </a>
-                                                                ) : (
-                                                                    <span className="resume-project-link" style={{ opacity: 0.5, cursor: "default" }}>
-                                                                        No link added
-                                                                    </span>
-                                                                )}
+                                                              {proj.link ? (
+    <a
+        href={proj.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="resume-project-link"
+    >
+        View Project <Icon name="arrow" size={14} />
+    </a>
+) : (
+    <span className="resume-project-link" style={{ opacity: 0.5, cursor: "default" }}>
+        No link added
+    </span>
+)}
                                                                 {(proj.refName || proj.refContact || proj.refEmail) && (
                                                                     <p className="resume-item-details">
                                                                         <strong>Reference:</strong> {proj.refName}

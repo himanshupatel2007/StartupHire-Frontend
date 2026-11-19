@@ -9,7 +9,6 @@ import { downloadResume } from "../../utils/resumePdf";
 import { CandidateIcon as Icon } from "../../components/ui/Icon";
 import { timeAgoInDays } from "../../utils/date";
 import { SOCIAL_API, socialPost } from "../../services/socialService";
-import { safeLink } from "../../utils/safeLink";
 import { mapJob } from "./candidateHelpers";
 import { menuGroups } from "./candidateMenu";
 import { BLANK_TEMPLATES, PAD_SECTIONS, SKILL_SUGGESTIONS, defaultResumeData } from "../../constants/resume";
@@ -452,13 +451,12 @@ function Candidate({ onLogout }) {
                                 item.endDate === "Present",
                         })),
 
-                        projects: cleaned.projects.map((project) => ({
-                            ...project,
-                            link: safeLink(project.link),
-                            technologies_used: Array.isArray(project.stack)
-                                ? project.stack.join(", ")
-                                : project.stack,
-                        })),
+                       projects: cleaned.projects.map((project) => ({
+    ...project,
+    technologies_used: Array.isArray(project.stack)
+        ? project.stack.join(", ")
+        : project.stack,
+})),
 
                         achievements: cleaned.achievements,
                     }),
