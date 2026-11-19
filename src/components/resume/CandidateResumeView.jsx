@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { API_LARAVEL } from "../../config/env";
-import { safeLink } from "../../utils/safeLink";
 
 const API = `${API_LARAVEL}/resume`;
 
@@ -237,13 +236,13 @@ export default function CandidateResumeView({ candidateId }) {
                                 </div>
                             )}
                             {x.description && <p className="crv-desc">{x.description}</p>}
-                            {safeLink(x.project_url) && (
-                                <p style={{ margin: "8px 0 0" }}>
-                                    <a className="crv-link" href={safeLink(x.project_url)} target="_blank" rel="noopener noreferrer">
-                                        View Project →
-                                    </a>
-                                </p>
-                            )}
+                          {x.project_url && (
+    <p style={{ margin: "8px 0 0" }}>
+        <a className="crv-link" href={x.project_url} target="_blank" rel="noopener noreferrer">
+            View Project →
+        </a>
+    </p>
+)}
                             <Reference item={x} />
                             <Files items={attFor("project", x.id)} />
                         </div>
@@ -266,13 +265,13 @@ export default function CandidateResumeView({ candidateId }) {
                                 </div>
                             )}
                             {c.details && <p className="crv-desc">{c.details}</p>}
-                            {safeLink(c.certificate_url) && (
-                                <p style={{ margin: "8px 0 0" }}>
-                                    <a className="crv-link" href={safeLink(c.certificate_url)} target="_blank" rel="noopener noreferrer">
-                                        View Certificate →
-                                    </a>
-                                </p>
-                            )}
+                          {c.certificate_url && (
+    <p style={{ margin: "8px 0 0" }}>
+        <a className="crv-link" href={c.certificate_url} target="_blank" rel="noopener noreferrer">
+            View Certificate →
+        </a>
+    </p>
+)}
                             <Files items={attFor("course", c.id)} />
                         </div>
                     ))}
